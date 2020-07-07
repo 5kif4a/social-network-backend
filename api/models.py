@@ -9,9 +9,11 @@ class Profile(models.Model):
     """
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
 
-    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True)
+    avatar = models.ImageField(upload_to="avatars/", null=True, blank=True,
+                               default="avatars/default_avatar.png")
 
-    theme = models.ImageField(upload_to="themes/", null=True, blank=True)
+    theme = models.ImageField(upload_to="themes/", null=True, blank=True,
+                              default="themes/default_theme.jpg")
 
     status = models.CharField(max_length=140, null=True, blank=True, default="")
 
@@ -35,7 +37,6 @@ class Post(models.Model):
 
     def __str__(self):
         return f"Post: {self.id} - User: {self.user.username} - {self.created_at}"
-
 
 # class Message(models.Model):
 #     """
