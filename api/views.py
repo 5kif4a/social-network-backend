@@ -1,4 +1,6 @@
 # Create your views here.
+import json
+
 from django.contrib.auth.models import User
 from rest_framework import viewsets, status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -13,6 +15,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
     def create(self, request, *args, **kwargs):
         try:
@@ -25,15 +28,34 @@ class ProfileViewSet(viewsets.ModelViewSet):
             new_profile = Profile(user=user)
             new_profile.save()
             return Response(status=status.HTTP_201_CREATED)
-        except Exception as e:
-            print(e)
+        except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def retrieve(self, request, *args, **kwargs):
-        user_id = kwargs.get('pk')
         try:
+            user_id = kwargs.get('pk')
             qs = Profile.objects.get(user_id=user_id)
             serializer = ProfileSerializer(qs)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, *args, **kwargs):
+        try:
+            data = request.data.copy()
+            # parsing user data
+            user_data = json.loads(request.data.get('user'))
+            data['user'] = user_data
+
+            instance = self.queryset.get(user_id=kwargs.get('pk'))
+
+            instance.user.first_name = user_data.get('first_name', instance.user.first_name)
+            instance.user.last_name = user_data.get('last_name', instance.user.last_name)
+            instance.user.save()
+
+            serializer = self.serializer_class(instance, data=data, partial=True)
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -46,9 +68,8 @@ class UserPostsViewSet(viewsets.ModelViewSet):
     parser_classes = (MultiPartParser, FormParser, JSONParser)
 
     def retrieve(self, request, *args, **kwargs):
-        user_id = kwargs.get('pk')
-
         try:
+            user_id = kwargs.get('pk')
             qs = Post.objects.filter(user_id=user_id).order_by('-created_at')
             if qs:
                 serializer = UserPostSerializer(qs, many=True)

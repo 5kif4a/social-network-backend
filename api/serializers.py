@@ -17,8 +17,15 @@ class UserPostSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(partial=True)
 
     class Meta:
         model = Profile
         exclude = ('id', 'updated_at')
+
+    def update(self, instance, validated_data):
+        instance.avatar = validated_data.get('avatar', instance.avatar)
+        instance.theme = validated_data.get('theme', instance.theme)
+        instance.status = validated_data.get('status', instance.status)
+        instance.save()
+        return instance

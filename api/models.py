@@ -48,9 +48,20 @@ class Post(models.Model):
 #     sent_at = models.DateTimeField(auto_now=True)
 #     delivered_at = models.DateTimeField()
 #     read_at = models.DateTimeField()
-
+#
 # class Comment(models.Model):
-#     pass
+#     post = models.ForeignKey('blog.Post', on_delete=models.CASCADE, related_name='comments')
+#     author = models.CharField(max_length=200)
+#     text = models.TextField()
+#     created_date = models.DateTimeField(default=timezone.now)
+#     approved_comment = models.BooleanField(default=False)
+#
+#     def approve(self):
+#         self.approved_comment = True
+#         self.save()
+#
+#     def __str__(self):
+#         return self.text
 #
 #
 # class Friend(models.Model):
