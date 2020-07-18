@@ -2,13 +2,13 @@
 import json
 
 from django.contrib.auth.models import User
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .models import Profile, Post
-from .serializers import ProfileSerializer, UserPostSerializer
+from .models import Profile, Post, Friend
+from .serializers import ProfileSerializer, UserPostSerializer, FriendSerializer
 
 
 class ProfileViewSet(viewsets.ModelViewSet):
@@ -70,11 +70,32 @@ class UserPostsViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, *args, **kwargs):
         try:
             user_id = kwargs.get('pk')
-            qs = Post.objects.filter(user_id=user_id).order_by('-created_at')
+            qs = self.queryset.filter(user_id=user_id).order_by('-created_at')
             if qs:
-                serializer = UserPostSerializer(qs, many=True)
+                serializer = self.serializer_class(qs, many=True)
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response(status=status.HTTP_204_NO_CONTENT)
+        except:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+# TODO User Searching by name
+class ProfileSearchView(generics.ListAPIView):
+    serializer_class = ProfileSerializer
+
+
+class FriendsViewSet(viewsets.ModelViewSet):
+    queryset = Friend.objects.all()
+    serializer_class = FriendSerializer
+    permission_classes = [IsAuthenticated]
+
+    def retrieve(self, request, *args, **kwargs):
+        try:
+            user_id = kwargs.get('pk')
+            user_friends = self.queryset.filter(user_id=user_id)
+            friends_profiles = [Profile.objects.get(user_id=friend.friend.id) for friend in user_friends]
+            data = ProfileSerializer(friends_profiles, many=True).data
+            return Response(data, status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_400_BAD_REQUEST)
