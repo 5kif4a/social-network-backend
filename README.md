@@ -6,7 +6,7 @@ Default DBMS: **SQLite 3**
 Using other DBMS you can find [here](https://docs.djangoproject.com/en/3.0/ref/databases/)    
 Download source code:
 ```
-$ git clone 
+$ git clone https://github.com/5kif4a/social-network-backend.git
 $ cd project_folder
 ```
 Create virtual environment:
