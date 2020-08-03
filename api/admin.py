@@ -1,9 +1,15 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
 from api.models import *
 
 
 # Register your models here.
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    model = User
+
+
 @admin.register(Profile)
 class ProfileAdmin(admin.ModelAdmin):
     pass

@@ -4,7 +4,7 @@ from .views import ProfileViewSet, UserPostsViewSet, FriendsViewSet
 
 router = DefaultRouter()
 router.register(r'profiles', ProfileViewSet)
-router.register(r'user_posts', UserPostsViewSet, basename='user_posts')
+router.register(r'user_posts', UserPostsViewSet)
 router.register(r'friends', FriendsViewSet)
 
 urlpatterns = router.urls

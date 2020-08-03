@@ -1,12 +1,20 @@
 # Create your models here.
-from django.contrib.auth.models import User
+import uuid
+
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+
+
+class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
 
 class Profile(models.Model):
     """
     Профиль пользователя
     """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
 
     avatar = models.ImageField(upload_to="avatars/", null=True, blank=True,
@@ -27,6 +35,8 @@ class Friend(models.Model):
     """
     Друг
     """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     friend = models.ForeignKey(User, on_delete=models.CASCADE, related_name="friends")
@@ -35,27 +45,11 @@ class Friend(models.Model):
         return f"Friendship: {self.user.username} - {self.friend.username}"
 
 
-class Post(models.Model):
-    """
-    Пост
-    """
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
-
-    content = models.TextField()
-
-    attachment = models.ImageField(upload_to="attachments/", null=True, blank=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Post by {self.user.username} - {self.created_at}"
-
-
 class Comment(models.Model):
     """
     Коммментарий
     """
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="comments")
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
     author = models.ForeignKey(User, on_delete=models.CASCADE)
 
@@ -65,6 +59,33 @@ class Comment(models.Model):
 
     def __str__(self):
         return f"Comment by {self.author.username}"
+
+
+class Post(models.Model):
+    """
+    Пост
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4)
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="posts")
+
+    content = models.TextField()
+
+    attachment = models.ImageField(upload_to="attachments/", null=True, blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    comments = models.ForeignKey(Comment, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return f"Post by {self.user.username} - {self.created_at}"
+
+
+class Chat(models.Model):
+    """
+    Чат
+    """
+    pass
 
 # class Message(models.Model):
 #     """
