@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,7 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'djoser',
     'rest_framework_simplejwt',
-    'api',
+    'api'
 ]
 
 MIDDLEWARE = [
@@ -177,4 +178,8 @@ if DEBUG:
 else:
     CORS_ORIGIN_WHITELIST = os.environ.get("CORS_ORIGIN_WHITELIST").split(',')
 
+# Custom User Authentication system
 AUTH_USER_MODEL = 'api.User'
+
+# Django Channels Settings
+ASGI_APPLICATION = "api.routing.application"
