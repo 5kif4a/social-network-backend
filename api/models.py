@@ -6,6 +6,9 @@ from django.db import models
 
 
 class User(AbstractUser):
+    """
+    Модель пользователя, у которого вместо INT ID - UUID
+    """
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
 
 

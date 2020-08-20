@@ -22,7 +22,13 @@ class ProfileViewSet(viewsets.ModelViewSet):
 
     # exclude from search result user himself & user friends
     def get_queryset(self):
-        qs = self.queryset.exclude(user=self.request.user)
+        """
+        SEARCH USERS
+        """
+        user_friends_ids = Friend.objects.filter(user=self.request.user).values_list('friend_id', flat=True)
+        qs = self.queryset\
+            .exclude(user=self.request.user)\
+            .exclude(user_id__in=user_friends_ids)
         return qs
 
     def create(self, request, *args, **kwargs):
